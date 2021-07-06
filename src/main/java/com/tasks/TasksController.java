@@ -1,12 +1,15 @@
 package com.tasks;
 
+import com.tasks.error.CustomError;
 import com.tasks.model.Task;
 import com.tasks.store.InMemoryStore;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Put;
+import io.micronaut.http.HttpResponse;
+import io.micronaut.http.HttpStatus;
+import io.micronaut.http.MediaType;
+import io.micronaut.http.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
@@ -24,11 +27,25 @@ public class TasksController {
     @Get("/")
     public List<Task> all() { return store.getAllTasks(); }
 
-    // ahhh, the @Body is referring to the body of the request
-    // ** Make it so that you can't add empty tasks
+
+
     @Operation(summary = "Adds a task to the list")
-    @Put("/")
-    public List<Task> update(@Body String text) {
-        return store.updateTasks(text);
+    @ApiResponse(
+            content = @Content(mediaType = MediaType.APPLICATION_JSON)
+    )
+    @ApiResponse(responseCode = "400", description = "No task provided")
+    @Post("/")
+    public HttpResponse addTask(@Body String text) {
+        if (text.isEmpty()){
+            final CustomError notFound = CustomError.builder()
+                    .status(HttpStatus.BAD_REQUEST.getCode())
+                    .error(HttpStatus.BAD_REQUEST.name())
+                    .message("No task provided")
+                    .path("/tasks/")
+                    .build();
+
+            return HttpResponse.badRequest(notFound);
+        }
+        return HttpResponse.ok(store.addNewTask(text));
     }
 }

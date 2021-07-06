@@ -22,7 +22,7 @@ public class InMemoryStore {
         return cachedTasks;
     }
 
-    public List<Task> updateTasks(String text) {
+    public List<Task> addNewTask(String text) {
         Task newTask = new Task(cachedTasks.size() + 1, text, false);
         cachedTasks.add(newTask);
         return cachedTasks;
