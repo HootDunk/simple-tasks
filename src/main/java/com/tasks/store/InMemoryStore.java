@@ -10,21 +10,39 @@ import java.util.*;
 public class InMemoryStore {
 
     private final List<Task> cachedTasks = new ArrayList<>();
+    private int taskCount = 1;
 
     public InMemoryStore() {
-        cachedTasks.add(new Task(1, "Walk the dog", false));
-        cachedTasks.add(new Task(2, "Finish laundry", false));
-        cachedTasks.add(new Task(3, "Complete training", false));
-        cachedTasks.add(new Task(4, "Go to the gym", false));
+        cachedTasks.add(new Task(taskCount++, "Walk the dog", false));
+        cachedTasks.add(new Task(taskCount++, "Finish laundry", false));
+        cachedTasks.add(new Task(taskCount++, "Complete training", false));
+        cachedTasks.add(new Task(taskCount++, "Go to the gym", false));
     }
 
     public List<Task> getAllTasks() {
         return cachedTasks;
     }
 
-    public List<Task> updateTasks(String text) {
-        Task newTask = new Task(cachedTasks.size() + 1, text, false);
+    public List<Task> addTask(String text) {
+        Task newTask = new Task(taskCount++, text, false);
         cachedTasks.add(newTask);
         return cachedTasks;
+    }
+
+    public Task updateTask(int id, String newText) {
+        Task matchingTask = cachedTasks.stream()
+                .filter(task -> id == task.getId())
+                .findAny()
+                .orElse(null);
+        matchingTask.setText(newText);
+        return matchingTask;
+    }
+
+    public void deleteTask(int id) {
+        int index = cachedTasks.indexOf(cachedTasks.stream()
+                .filter(task -> id == task.getId())
+                .findAny()
+                .orElse(null));
+        cachedTasks.remove(index);
     }
 }

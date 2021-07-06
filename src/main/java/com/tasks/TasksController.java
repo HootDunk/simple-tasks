@@ -2,15 +2,11 @@ package com.tasks;
 
 import com.tasks.model.Task;
 import com.tasks.store.InMemoryStore;
-import io.micronaut.http.annotation.Body;
-import io.micronaut.http.annotation.Controller;
-import io.micronaut.http.annotation.Get;
-import io.micronaut.http.annotation.Put;
+import io.micronaut.http.annotation.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 
 import java.util.List;
-import java.util.Map;
 
 
 @Tag(name = "Tasks Service")
@@ -24,11 +20,21 @@ public class TasksController {
     @Get("/")
     public List<Task> all() { return store.getAllTasks(); }
 
-    // ahhh, the @Body is referring to the body of the request
-    // ** Make it so that you can't add empty tasks
     @Operation(summary = "Adds a task to the list")
-    @Put("/")
-    public List<Task> update(@Body String text) {
-        return store.updateTasks(text);
+    @Post("/")
+    public List<Task> addTask(@Body String text) {
+        return store.addTask(text);
+    }
+
+    @Operation(summary = "Update a task by its id")
+    @Put("/{id}")
+    public Task updateTaskText(@PathVariable int id, @Body String newText) {
+        return store.updateTask(id, newText);
+    }
+
+    @Operation(summary = "Delete a task by its id")
+    @Delete("/{id}")
+    public void delete(@PathVariable int id) {
+        store.deleteTask(id);
     }
 }
